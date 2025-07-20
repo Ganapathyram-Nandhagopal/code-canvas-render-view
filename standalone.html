@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor - GitHub Style</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa;
+            color: #24292f;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #fff;
+            border-bottom: 1px solid #d1d9e0;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .github-icon {
+            width: 32px;
+            height: 32px;
+            fill: #24292f;
+        }
+
+        .header-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .header-info p {
+            font-size: 14px;
+            color: #656d76;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d9e0;
+            border-radius: 6px;
+            background-color: #f6f8fa;
+            color: #24292f;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #e7eef3;
+        }
+
+        .btn-primary {
+            background-color: #2da44e;
+            border-color: #2da44e;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #2c974b;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .code-panel {
+            width: 50%;
+            border-right: 1px solid #d1d9e0;
+            background-color: #fff;
+        }
+
+        .output-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #f6f8fa;
+            border-bottom: 1px solid #d1d9e0;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #656d76;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #24292f;
+            background-color: #fff;
+            border-bottom-color: #fd7e14;
+        }
+
+        .tab:hover:not(.active) {
+            color: #24292f;
+        }
+
+        .editor-container {
+            height: calc(100% - 48px);
+            position: relative;
+        }
+
+        .editor {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            padding: 16px;
+            font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #f6f8fa;
+            color: #24292f;
+            resize: none;
+        }
+
+        .editor:focus {
+            background-color: #fff;
+        }
+
+        .output-header {
+            background-color: #f6f8fa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #d1d9e0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .output-frame {
+            flex: 1;
+            border: none;
+            background-color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .code-panel,
+            .output-panel {
+                width: 100%;
+                height: 50%;
+            }
+            
+            .code-panel {
+                border-right: none;
+                border-bottom: 1px solid #d1d9e0;
+            }
+            
+            .header {
+                padding: 12px 16px;
+            }
+            
+            .header-left {
+                gap: 12px;
+            }
+            
+            .github-icon {
+                width: 24px;
+                height: 24px;
+            }
+            
+            .header-info h1 {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <svg class="github-icon" viewBox="0 0 24 24">
+                <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <div class="header-info">
+                <h1>Code Editor</h1>
+                <p>Write HTML, CSS, and JavaScript code with live preview</p>
+            </div>
+        </div>
+        <div class="header-buttons">
+            <button class="btn btn-primary" onclick="runCode()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                Run
+            </button>
+            <button class="btn" onclick="resetCode()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                Reset
+            </button>
+            <button class="btn" onclick="downloadCode()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="code-panel">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('html')">HTML</button>
+                <button class="tab" onclick="switchTab('css')">CSS</button>
+                <button class="tab" onclick="switchTab('js')">JavaScript</button>
+            </div>
+            <div class="editor-container">
+                <div id="html-content" class="tab-content active">
+                    <textarea id="html-editor" class="editor" placeholder="Enter your HTML code here..."><h1>Hello World!</h1>
+<p>Welcome to the code editor</p></textarea>
+                </div>
+                <div id="css-content" class="tab-content">
+                    <textarea id="css-editor" class="editor" placeholder="Enter your CSS code here...">body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #f5f5f5;
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+}</textarea>
+                </div>
+                <div id="js-content" class="tab-content">
+                    <textarea id="js-editor" class="editor" placeholder="Enter your JavaScript code here...">// Add your JavaScript here
+console.log("Hello from JavaScript!");</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="output-panel">
+            <div class="output-header">
+                Output
+            </div>
+            <iframe id="output-frame" class="output-frame" sandbox="allow-scripts"></iframe>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'html';
+        
+        const htmlEditor = document.getElementById('html-editor');
+        const cssEditor = document.getElementById('css-editor');
+        const jsEditor = document.getElementById('js-editor');
+        const outputFrame = document.getElementById('output-frame');
+
+        function switchTab(tab) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tab + '-content').classList.add('active');
+            
+            currentTab = tab;
+        }
+
+        function runCode() {
+            const html = htmlEditor.value;
+            const css = cssEditor.value;
+            const js = jsEditor.value;
+
+            const combinedCode = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Output</title>
+                    <style>
+                        ${css}
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                    <script>
+                        // Capture console.log
+                        const originalLog = console.log;
+                        console.log = function(...args) {
+                            originalLog.apply(console, args);
+                            window.parent.postMessage({
+                                type: 'console',
+                                data: args.join(' ')
+                            }, '*');
+                        };
+
+                        try {
+                            ${js}
+                        } catch (error) {
+                            window.parent.postMessage({
+                                type: 'error',
+                                data: error.message
+                            }, '*');
+                        }
+                    </script>
+                </body>
+                </html>
+            `;
+
+            outputFrame.srcdoc = combinedCode;
+        }
+
+        function resetCode() {
+            htmlEditor.value = '<h1>Hello World!</h1>\\n<p>Welcome to the code editor</p>';
+            cssEditor.value = 'body {\\n  font-family: Arial, sans-serif;\\n  margin: 20px;\\n  background: #f5f5f5;\\n}\\n\\nh1 {\\n  color: #333;\\n  text-align: center;\\n}';
+            jsEditor.value = '// Add your JavaScript here\\nconsole.log("Hello from JavaScript!");';
+            runCode();
+        }
+
+        function downloadCode() {
+            const html = htmlEditor.value;
+            const css = cssEditor.value;
+            const js = jsEditor.value;
+
+            const combinedCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Project</title>
+  <style>
+    ${css}
+  </style>
+</head>
+<body>
+  ${html}
+  <script>
+    ${js}
+  </script>
+</body>
+</html>`;
+
+            const blob = new Blob([combinedCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-run code when editors change
+        htmlEditor.addEventListener('input', runCode);
+        cssEditor.addEventListener('input', runCode);
+        jsEditor.addEventListener('input', runCode);
+
+        // Handle messages from iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'console') {
+                console.log('Output:', event.data.data);
+            } else if (event.data.type === 'error') {
+                console.error('Error:', event.data.data);
+            }
+        });
+
+        // Initial run
+        runCode();
+    </script>
+</body>
+</html>
